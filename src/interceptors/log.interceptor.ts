@@ -6,8 +6,11 @@ export class LogInterceptor implements NestInterceptor {
     console.log('Before...');
     const now = Date.now();
 
+    const request = context.switchToHttp().getRequest();
+
     return next
       .handle()
+      .pipe(tap(() => console.log(request.url)))
       .pipe(tap(() => console.log(`After... ${Date.now() - now}ms`)));
     //O "tap" serve para executar uma ação antes ou depois da requisição pegando o resultado dela e fazendo algo com ele
   }
