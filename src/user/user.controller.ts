@@ -2,8 +2,9 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, U
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
-import { UserService } from "./user.service";
-import { LogInterceptor } from "../interceptors/log.interceptor";
+import { UserService } from './user.service';
+import { LogInterceptor } from '../interceptors/log.interceptor';
+import { ParamId } from '../decorators/param-id.decorator';
 
 // @UseInterceptors(LogInterceptor) //Usando o interceptor localmente em todos os métodos
 @Controller('users')
@@ -22,7 +23,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async show(@Param('id', ParseIntPipe) id: number) {
+  async show(@ParamId() id: number) {
     return this.userService.findOne(id);
   }
 
