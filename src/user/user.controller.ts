@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, UseInterceptors } from "@nestjs/common";
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePutUserDto } from './dto/update-put-user.dto';
-import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Put,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { UpdatePutUserDTO } from './dto/update-put-user.dto';
+import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
 import { UserService } from './user.service';
 import { LogInterceptor } from '../interceptors/log.interceptor';
 import { ParamId } from '../decorators/param-id.decorator';
@@ -13,7 +22,7 @@ export class UserController {
 
   @UseInterceptors(LogInterceptor) //Usando o interceptor localmente em um método específico
   @Post()
-  async create(@Body() data: CreateUserDto) {
+  async create(@Body() data: CreateUserDTO) {
     return this.userService.create(data);
   }
 
@@ -28,20 +37,21 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id: number, params: any, @Body() data: UpdatePutUserDto) {
+  async update(
+    @ParamId() id: number,
+    params: any,
+    @Body() data: UpdatePutUserDTO,
+  ) {
     return this.userService.update(id, data);
   }
 
   @Patch(':id')
-  async updatePatch(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdatePatchUserDto,
-  ) {
+  async updatePatch(@ParamId() id: number, @Body() data: UpdatePatchUserDTO) {
     return this.userService.updatePatch(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@ParamId() id: number) {
     return this.userService.delete(id);
   }
 }

@@ -1,22 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDTO } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdatePutUserDto } from './dto/update-put-user.dto';
-import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
+import { UpdatePutUserDTO } from './dto/update-put-user.dto';
+import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-  async create({ email, name, password }: CreateUserDto) {
+  async create({ email, name, password }: CreateUserDTO) {
     return this.prisma.users.create({
       data: {
         email,
         name,
         password,
       },
-      select: {
-        id: true, // 👈 We only need the id back to return to the client
-      },
+      // select: {
+      //   id: true, // 👈 We only need the id back to return to the client
+      // },
     });
   }
 
@@ -36,7 +36,7 @@ export class UserService {
 
   async update(
     id: number,
-    { name, email, password, birth_at }: UpdatePutUserDto,
+    { name, email, password, birth_at }: UpdatePutUserDTO,
   ) {
     await this.exists(id);
 
@@ -55,7 +55,7 @@ export class UserService {
 
   async updatePatch(
     id: number,
-    { name, email, password, birth_at }: UpdatePatchUserDto,
+    { name, email, password, birth_at }: UpdatePatchUserDTO,
   ) {
     await this.exists(id);
 
