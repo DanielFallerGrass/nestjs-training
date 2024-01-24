@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { users } from "@prisma/client";
-import { PrismaService } from "../prisma/prisma.service";
-import { AuthRegisterDTO } from "./dto/auth-register.dto";
-import { UserService } from "../user/user.service";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { users } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { AuthRegisterDTO } from './dto/auth-register.dto';
+import { UserService } from '../user/user.service';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -59,11 +60,13 @@ export class AuthService {
       where: { email },
     });
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('User not found or password incorrect!');
     }
-    if (user.password !== password) {
-      throw new UnauthorizedException('Wrong password');
+
+    if (!(await compare(password, user.password))) {
+      throw new UnauthorizedException('User not found or password incorrect!');
     }
+
     return this.createToken(user);
   }
 
