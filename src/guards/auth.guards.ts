@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../user/user.service';
 
@@ -18,7 +18,10 @@ export class AuthGuard implements CanActivate {
         (authorization ?? '').split(' ')[1],
       ); // 👈 Aqui eu pego o token do header e removo o Bearer e invoco o método checkToken do AuthService
 
+      console.log(request.user);
+
       request.user = await this.userService.findOne(request.user.id);
+      return true;
     } catch (e) {
       return false;
     }
