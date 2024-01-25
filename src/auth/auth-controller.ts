@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   Post,
-  UploadedFile,
+  UploadedFile, // Esse é o decorator que usamos para fazer upload de um arquivo apenas
+  //UploadedFiles,  // Esse é o decorator que usamos para fazer upload de vários arquivos de uma vez
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
