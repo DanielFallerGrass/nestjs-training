@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from '../user/user.service';
 import { compare } from 'bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly mailerService: MailerService,
   ) {}
 
   createToken(user: users) {
@@ -79,7 +81,25 @@ export class AuthService {
       throw new UnauthorizedException('E-mail not found');
     }
 
-    //TODO: enviar e-mail com o token de reset de senha
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Reset your password',
+      template: 'forgot',
+      context: {
+        name: user.name,
+        token: this.jwtService.sign(
+          {
+            id: user.id,
+          },
+          {
+            expiresIn: '1h',
+            subject: user.id.toString(),
+            issuer: 'forgot',
+            audience: 'users',
+          },
+        ),
+      },
+    });
     return true;
   }
 

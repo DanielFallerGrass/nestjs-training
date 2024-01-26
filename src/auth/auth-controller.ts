@@ -1,6 +1,9 @@
 import {
   Body,
   Controller,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Post,
   UploadedFile, // Esse é o decorator que usamos para fazer upload de um arquivo apenas
   //UploadedFiles,  // Esse é o decorator que usamos para fazer upload de vários arquivos de uma vez
@@ -60,7 +63,15 @@ export class AuthController {
   @Post('photo')
   async uploadPhoto(
     @User() user: users,
-    @UploadedFile() photo: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: 'image/jpeg' }), //pdf seria o application/pdf
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+        ],
+      }),
+    )
+    photo: Express.Multer.File,
   ) {
     const path = join(
       __dirname,
@@ -77,6 +88,6 @@ export class AuthController {
       throw e;
     }
 
-    return { data: { photo: `photo-${user.id}.jpg` } };
+    return { data: { photo: `photo-${user.id}.jpg`, details: photo } };
   }
 }
