@@ -6,6 +6,7 @@ import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from '../user/user.service';
 import { compare } from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -104,16 +105,30 @@ export class AuthService {
   }
 
   async resetPassword(password: string, token: string) {
-    //TODO: verificar se o token é válido
+    try {
+      const data: any = this.jwtService.verify(token, {
+        issuer: 'forgot',
+        audience: 'users',
+      });
 
-    const id = 1;
+      if (isNaN(Number(data.id))) {
+        throw new UnauthorizedException('Invalid token');
+      }
 
-    const user = await this.prisma.users.update({
-      where: { id },
-      data: { password },
-    });
+      const salt = await bcrypt.genSalt();
+      data.password = await bcrypt.hash(password, salt);
 
-    return this.createToken(user);
+      const user = await this.prisma.users.update({
+        where: {
+          id: Number(data.id),
+        },
+        data: { password: data.password },
+      });
+
+      return this.createToken(user);
+    } catch (e) {
+      throw new UnauthorizedException(e);
+    }
   }
 
   async register(data: AuthRegisterDTO) {
